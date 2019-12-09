@@ -1,0 +1,4 @@
+{
+  "plugins": ["@babel/plugin-proposal-class-properties"],
+  "presets": [["modern-browsers", { "loose": true }], "@babel/preset-react"]
+}
