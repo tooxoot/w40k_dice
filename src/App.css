@@ -63,4 +63,36 @@ h3 .check {
   grid-column-gap: 5px;
   grid-row-gap: 10px;
   align-items: center;
+  padding: 20px;
+}
+
+.log {
+  grid-column: span 5;
+  display: flex;
+  flex-flow: column;
+  align-items: flex-end;
+  margin-top: 20px;
+}
+
+.log-label {
+  background: #e0e0e0;
+  border-radius: 10px 10px 10px 10px;
+  padding: 5px;
+}
+
+.log-label.log-expanded {
+  border-radius: 10px 10px 0px 0px;
+}
+
+.log-content.log-expanded {
+  display: flex;
+  flex-flow: column;
+}
+
+.log-content {
+  display: none;
+  background: #e0e0e0;
+  border-radius: 10px 0px 10px 10px;
+  padding: 10px;
+  min-width: 20%;
 }

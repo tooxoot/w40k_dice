@@ -2,6 +2,43 @@ import React from 'react'
 import './App.css'
 import { getResult } from './HitsAndWounds'
 
+class Log extends React.Component {
+  constructor(hands) {
+    super(hands)
+    this.state = {
+      expanded: false
+    }
+  }
+
+  componentDidUpdate() {
+    if (!this.state.expanded) {
+      return
+    }
+    this.refs['content'].scrollIntoView()
+  }
+
+  render() {
+    return (
+      <div className="log">
+        <div
+          className={`log-label ${this.state.expanded ? 'log-expanded' : ''}`}
+          onClick={() => this.setState({ expanded: !this.state.expanded })}
+        >
+          Show Log: {this.state.expanded ? <>&#11023;</> : <>&#11022;</>}
+        </div>
+        <div
+          className={`log-content ${this.state.expanded ? 'log-expanded' : ''}`}
+          ref={'content'}
+        >
+          {this.props.hands.map((hand, idx) => (
+            <div key={idx}>{JSON.stringify(hand)}</div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+}
+
 const Table = ({ hand }) => (
   <div className="result-table">
     <div className="head">&lt; 1</div>
@@ -196,6 +233,7 @@ class App extends React.Component {
             onChange={explodeWounds => this.setState({ explodeWounds })}
           />
         </div>
+        <Log hands={this.state.hands} />
       </div>
     )
   }
