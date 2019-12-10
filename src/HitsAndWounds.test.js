@@ -22,6 +22,12 @@ const mockRandom = () => {
   return () => (c === 6 ? (c = 1) : ++c) / 6
 }
 
+test('Roller constructor', () => {
+  const o = {}
+  expect(new Roller(o).random).toBe(o)
+  expect(new Roller().random).toBe(Math.random)
+})
+
 describe('Hits', () => {
   test('simple bs = 4', () => {
     let roller = new Roller(mockRandom())
