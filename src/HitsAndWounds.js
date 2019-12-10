@@ -1,5 +1,8 @@
 export class Roller {
-  random = Math.random
+  constructor(random) {
+    this.random = random || Math.random
+  }
+
   rollD6 = () => Math.ceil(this.random() * 6)
 
   rollHand = count => _hand => [...new Array(count)].map(this.rollD6)
@@ -96,21 +99,25 @@ export class Roller {
   ]
 }
 
-export const getResult = ({
-  count,
-  bs,
-  hitmod,
-  rerollHitsOfOne,
-  rerollHitFails,
-  explodeHits,
-  doWounds,
-  s,
-  t,
-  woundmod,
-  rerollWoundsOfOne,
-  rerollWoundFails,
-  explodeWounds
-}) => {
+const defaultRoller = new Roller()
+export const getResult = (
+  {
+    count,
+    bs,
+    hitmod,
+    rerollHitsOfOne,
+    rerollHitFails,
+    explodeHits,
+    doWounds,
+    s,
+    t,
+    woundmod,
+    rerollWoundsOfOne,
+    rerollWoundFails,
+    explodeWounds
+  },
+  roller = defaultRoller
+) => {
   const inputTypes = [
     [count, 'number', v => v > 0],
     [bs, 'number', v => v > 0 && v < 7],
@@ -143,8 +150,6 @@ export const getResult = ({
       throw { Error: `DiecRoller: Argument failed assertion`, inputTypes }
     }
   })
-
-  let roller = new Roller()
 
   let steps = roller.getHitSteps({
     count: count,
