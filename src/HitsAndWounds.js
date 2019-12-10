@@ -1,106 +1,100 @@
-export const rollD6 = () => Math.ceil(Math.random() * 6)
+export class Roller {
+  random = Math.random
+  rollD6 = () => Math.ceil(this.random() * 6)
 
-export const rollHand = count => _hand => [...new Array(count)].map(rollD6)
-export const rerollIf = isTrueFor => hand =>
-  hand.map(result => (isTrueFor(result) ? rollD6() : result))
-export const newHand = hand => rollHand(hand.length)()
-export const dropIf = isTrueFor => hand =>
-  hand.filter(result => !isTrueFor(result))
-export const applyModifier = modifyer => hand =>
-  hand.map(result => result + modifyer)
+  rollHand = count => _hand => [...new Array(count)].map(this.rollD6)
 
-export const is = x => result => result === x
-export const isLessThan = x => result => result < x
-export const isGreaterThan = x => result => result > x
+  rerollIf = isTrueFor => hand =>
+    hand.map(result => (isTrueFor(result) ? this.rollD6() : result))
 
-export const doSequence = steps =>
-  steps.reduce((hands, step) => [...hands, step(hands.slice(-1)[0])], [[]])
+  newHand = hand => this.rollHand(hand.length)()
 
-export const count = isTrueFor => hand => hand.filter(isTrueFor).length
-export const getCounts = hand =>
-  [
-    count(isLessThan(1)),
-    count(is(1)),
-    count(is(2)),
-    count(is(3)),
-    count(is(4)),
-    count(is(5)),
-    count(is(6)),
-    count(isGreaterThan(6))
-  ].map(f => f(hand))
+  dropIf = isTrueFor => hand => hand.filter(result => !isTrueFor(result))
 
-export const getSteps = ({
-  rerollOnes,
-  rerollFails,
-  modifyer,
-  explodeSixPlus,
-  hasFailed
-}) => {
-  if (rerollFails && explodeSixPlus)
-    throw 'Error: Reroll Fails && Explode Sixes'
-  const steps = []
+  applyModifier = modifyer => hand => hand.map(result => result + modifyer)
 
-  if (rerollOnes) steps.push(rerollIf(is(1)))
+  is = x => result => result === x
+  isLessThan = x => result => result < x
+  isGreaterThan = x => result => result > x
 
-  if (explodeSixPlus)
-    steps.push(hand => {
-      let count6 = count(is(6))(hand)
-      let newRolls = rollHand(count6)()
-      if (rerollOnes) newRolls = rerollIf(is(1))(newRolls)
-      return [...hand, ...newRolls]
+  count = isTrueFor => hand => hand.filter(isTrueFor).length
+
+  doSequence = steps =>
+    steps.reduce((hands, step) => [...hands, step(hands.slice(-1)[0])], [[]])
+
+  getSteps = ({
+    rerollOnes,
+    rerollFails,
+    modifyer,
+    explodeSixPlus,
+    hasFailed
+  }) => {
+    if (rerollFails && explodeSixPlus)
+      throw 'Error: Reroll Fails && Explode Sixes'
+    const steps = []
+
+    if (rerollOnes) steps.push(this.rerollIf(this.is(1)))
+
+    if (explodeSixPlus)
+      steps.push(hand => {
+        let count6 = this.count(this.is(6))(hand)
+        let newRolls = this.rollHand(count6)()
+        if (rerollOnes) newRolls = this.rerollIf(this.is(1))(newRolls)
+        return [...hand, ...newRolls]
+      })
+
+    steps.push(this.applyModifier(modifyer))
+    if (rerollFails && hasFailed) steps.push(this.rerollIf(hasFailed))
+    steps.push(this.dropIf(hasFailed))
+    return steps
+  }
+
+  getHitSteps = ({
+    count,
+    BF,
+    rerollOnes,
+    rerollFails,
+    modifyer,
+    explodeSixPlus
+  }) => [
+    this.rollHand(count),
+    ...this.getSteps({
+      rerollOnes,
+      rerollFails,
+      modifyer,
+      explodeSixPlus,
+      hasFailed: this.isLessThan(BF)
     })
+  ]
 
-  steps.push(applyModifier(modifyer))
-  if (rerollFails && hasFailed) steps.push(rerollIf(hasFailed))
-  steps.push(dropIf(hasFailed))
-  return steps
+  getWoundSteps = ({
+    count,
+    S,
+    T,
+    rerollOnes,
+    rerollFails,
+    modifyer = 0,
+    explodeSixPlus
+  }) => [
+    count ? this.rollHand(count) : this.newHand,
+    ...this.getSteps({
+      rerollOnes,
+      rerollFails,
+      modifyer,
+      explodeSixPlus,
+      hasFailed:
+        S >= 2 * T
+          ? this.isLessThan(2)
+          : S > T
+          ? this.isLessThan(3)
+          : S === T
+          ? this.isLessThan(4)
+          : !(2 * S <= T)
+          ? this.isLessThan(5)
+          : this.isLessThan(6)
+    })
+  ]
 }
-
-export const getHitSteps = ({
-  count,
-  BF,
-  rerollOnes,
-  rerollFails,
-  modifyer,
-  explodeSixPlus
-}) => [
-  rollHand(count),
-  ...getSteps({
-    rerollOnes,
-    rerollFails,
-    modifyer,
-    explodeSixPlus,
-    hasFailed: isLessThan(BF)
-  })
-]
-
-export const getWoundSteps = ({
-  count,
-  S,
-  T,
-  rerollOnes,
-  rerollFails,
-  modifyer = 0,
-  explodeSixPlus
-}) => [
-  count ? rollHand(count) : newHand,
-  ...getSteps({
-    rerollOnes,
-    rerollFails,
-    modifyer,
-    explodeSixPlus,
-    hasFailed:
-      S >= 2 * T
-        ? isLessThan(2)
-        : S > T
-        ? isLessThan(3)
-        : S === T
-        ? isLessThan(4)
-        : !(2 * S <= T)
-        ? isLessThan(5)
-        : isLessThan(6)
-  })
-]
 
 export const getResult = ({
   count,
@@ -150,7 +144,9 @@ export const getResult = ({
     }
   })
 
-  let steps = getHitSteps({
+  let roller = new Roller()
+
+  let steps = roller.getHitSteps({
     count: count,
     BF: bs,
     rerollOnes: rerollHitsOfOne,
@@ -162,7 +158,7 @@ export const getResult = ({
   if (doWounds) {
     steps = [
       ...steps,
-      ...getWoundSteps({
+      ...roller.getWoundSteps({
         S: s,
         T: t,
         rerollOnes: rerollWoundsOfOne,
@@ -173,5 +169,5 @@ export const getResult = ({
     ]
   }
 
-  return doSequence(steps)
+  return roller.doSequence(steps)
 }
