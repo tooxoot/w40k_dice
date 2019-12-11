@@ -1,24 +1,29 @@
-name: Build - Test - Publish
+name: Build - Test - Push - Publish
 
 on: [push]
 
 env:
   GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
   GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
+  GKE_SERVICE: ${{ secrets.GKE_SERVICE}}
   GITHUB_SHA: ${{ github.sha }}
   IMAGE: w40kdice
 
 jobs:
-  build:
+  build_test_push:
+    name: Build - Test - Push
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v1
+
       - name: Use Node.js 12
         uses: actions/setup-node@v1
         with:
           node-version: 12
-      - name: npm install, build, and test
+
+      - name: NPM install - build - test
         run: |
           npm ci
           npm run build
@@ -27,24 +32,50 @@ jobs:
           CI: true
 
       # Setup gcloud CLI
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - name: Setup Google Cloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           version: '270.0.0'
           service_account_email: ${{ secrets.GKE_EMAIL }}
           service_account_key: ${{ secrets.GKE_KEY }}
-      - run: |
+      - name: Docker - Cloud Authentication
+        run: |
           # Set up docker to authenticate
           # via gcloud command-line tool.
           gcloud auth configure-docker
 
       # Build the Docker image
-      - name: Build
+
+      - name: Docker build
         run: |
           docker build -t gcr.io/"$GKE_PROJECT"/"$IMAGE":"$GITHUB_SHA" \
             --build-arg GITHUB_SHA="$GITHUB_SHA" \
             --build-arg GITHUB_REF="$GITHUB_REF" .
 
       # Push the Docker image to Google Container Registry
-      - name: Publish
+      - name: Push Image
         run: |
           docker push gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA
+
+  deploy:
+    name: Deploy
+    needs: build_test_push
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Setup Google Cloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '270.0.0'
+          service_account_email: ${{ secrets.GKE_EMAIL }}
+          service_account_key: ${{ secrets.GKE_KEY }}
+
+      - name: Install beta components
+        run: |
+          gcloud components install beta
+
+      - name: Deploy image
+        run: |
+          gcloud beta run deploy $GKE_SERVICE --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
