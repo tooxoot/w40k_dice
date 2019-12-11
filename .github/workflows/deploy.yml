@@ -27,6 +27,7 @@ jobs:
           # via gcloud command-line tool.
           gcloud auth configure-docker
 
-      - name: Deploy
-          # Deploy previously build docker container
+      - name: deploy
+        # Deploy previously build docker container
+        run: |
           gcloud beta run deploy $GKE_SERVICE --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA
