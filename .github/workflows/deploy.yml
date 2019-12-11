@@ -35,4 +35,4 @@ jobs:
       - name: deploy
         # Deploy previously build docker container
         run: |
-          gcloud beta run deploy $GKE_SERVICE --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1
+          gcloud beta run deploy $GKE_SERVICE --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
