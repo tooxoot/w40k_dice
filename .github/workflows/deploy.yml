@@ -2,7 +2,8 @@ name: Build - Test - Publish
 
 on:
   push:
-    - master
+    branches:
+      - master
 
 env:
   GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
