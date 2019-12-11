@@ -23,16 +23,12 @@ jobs:
           version: '270.0.0'
           service_account_email: ${{ secrets.GKE_EMAIL }}
           service_account_key: ${{ secrets.GKE_KEY }}
-      - run: |
-          # Set up docker to authenticate
-          # via gcloud command-line tool.
-          gcloud auth configure-docker
 
       - run: |
           # Install beta components
           gcloud components install beta
 
-      - name: deploy
+      - name: Deploy
         # Deploy previously build docker container
         run: |
           gcloud beta run deploy $GKE_SERVICE --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
