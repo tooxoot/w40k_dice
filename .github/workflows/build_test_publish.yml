@@ -62,7 +62,7 @@ jobs:
     needs: build_test_push
     runs-on: ubuntu-latest
 
-    if: ${{ github.ref == 'refs/heads/master' }}
+    if: github.ref == 'refs/heads/master'
 
     steps:
       - name: Setup Google Cloud
