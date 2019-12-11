@@ -1,4 +1,4 @@
-name: Build - Test - Publish
+name: Deploy
 
 on:
   push:
@@ -27,6 +27,10 @@ jobs:
           # Set up docker to authenticate
           # via gcloud command-line tool.
           gcloud auth configure-docker
+
+      - run: |
+          # Install beta components
+          gcloud components install beta
 
       - name: deploy
         # Deploy previously build docker container
