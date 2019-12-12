@@ -108,6 +108,7 @@ class App extends React.Component {
       hitmod: 0,
       rerollHitsOfOne: false,
       rerollHitFails: false,
+      keepHitSixes: false,
       explodeHits: false,
       doWounds: false,
       s: 4,
@@ -115,6 +116,7 @@ class App extends React.Component {
       woundmod: 0,
       rerollWoundsOfOne: false,
       rerollWoundFails: false,
+      keepWoundSixes: false,
       explodeWounds: false
     }
   }
@@ -127,6 +129,7 @@ class App extends React.Component {
         hitmod: this.state.hitmod,
         rerollHitsOfOne: this.state.rerollHitsOfOne,
         rerollHitFails: this.state.rerollHitFails,
+        keepHitSixes: this.state.keepHitSixes,
         explodeHits: this.state.explodeHits,
         doWounds: this.state.doWounds,
         s: this.state.s,
@@ -134,6 +137,7 @@ class App extends React.Component {
         woundmod: this.state.woundmod,
         rerollWoundsOfOne: this.state.rerollWoundsOfOne,
         rerollWoundFails: this.state.rerollWoundFails,
+        keepWoundSixes: this.state.keepHitSixes,
         explodeWounds: this.state.explodeWounds
       })
     })
@@ -181,6 +185,11 @@ class App extends React.Component {
             onChange={rerollHitFails => this.setState({ rerollHitFails })}
           />
           <Check
+            text="Keep 6"
+            checked={this.state.keepHitSixes}
+            onChange={keepHitSixes => this.setState({ keepHitSixes })}
+          />
+          <Check
             text="Explode on 6"
             checked={this.state.explodeHits}
             onChange={explodeHits => this.setState({ explodeHits })}
@@ -212,8 +221,8 @@ class App extends React.Component {
         <Slider
           text="Modifier"
           value={this.state.woundmod}
-          min={0}
-          max={10}
+          min={-3}
+          max={3}
           onChange={woundmod => this.setState({ woundmod })}
         />
         <div className="check-row">
@@ -226,6 +235,11 @@ class App extends React.Component {
             text="Reroll Fails"
             checked={this.state.rerollWoundFails}
             onChange={rerollWoundFails => this.setState({ rerollWoundFails })}
+          />
+          <Check
+            text="Keep 6"
+            checked={this.state.keepWoundSixes}
+            onChange={keepWoundSixes => this.setState({ keepWoundSixes })}
           />
           <Check
             text="Explode on 6"

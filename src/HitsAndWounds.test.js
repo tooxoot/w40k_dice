@@ -7,6 +7,7 @@ let args = {
   hitmod: 0,
   rerollHitsOfOne: false,
   rerollHitFails: false,
+  keepHitSixes: false,
   explodeHits: false,
   doWounds: false,
   s: 4,
@@ -14,6 +15,7 @@ let args = {
   woundmod: 0,
   rerollWoundsOfOne: false,
   rerollWoundFails: false,
+  keepWoundSixes: false,
   explodeWounds: false
 }
 
@@ -37,7 +39,7 @@ describe('Hits', () => {
     expect(count).toBe(expected)
   })
 
-  test('simple bs = 6', () => {
+  test('simple bs = 5', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
@@ -150,6 +152,110 @@ describe('Hits', () => {
     let expected = samplesize * (1 / 2 + 1 / 6 / 2)
     let allSixes = samplesize * (1 / 6 + 1 / 6 / 6)
     expected = expected + allSixes * (1 / 2 + 1 / 6 / 2)
+
+    expect(count).toBe(expected)
+  })
+
+  test('keep, bs = 4', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        keepHitSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize * (1 / 2)
+
+    expect(count).toBe(expected)
+  })
+
+  test('keep, mod = +2, bs = 6', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        bs: 6,
+        hitmod: 2,
+        keepHitSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize * (3 / 6)
+
+    expect(count).toBe(expected)
+  })
+
+  test('keep, mod = -2, bs = 5', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        bs: 5,
+        hitmod: -2,
+        keepHitSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize * (1 / 6)
+
+    expect(count).toBe(expected)
+  })
+
+  test('reroll ones and keep, mod = -2, bs = 5', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        bs: 5,
+        hitmod: -2,
+        rerollHitsOfOne: true,
+        keepHitSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize / 6 + samplesize / 6 / 6
+
+    expect(count).toBe(expected)
+  })
+
+  test('explode and keep, mod = -2, bs = 5', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        bs: 5,
+        hitmod: -2,
+        explodeHits: true,
+        keepHitSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize / 6 + samplesize / 6 / 6
+
+    expect(count).toBe(expected)
+  })
+
+  test('rerollOnes and explode and keep, mod = -2, bs = 5', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        bs: 5,
+        hitmod: -2,
+        rerollHitsOfOne: true,
+        explodeHits: true,
+        keepHitSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected =
+      samplesize / 6 +
+      samplesize / 6 / 6 +
+      samplesize / 6 / 6 +
+      samplesize / 6 / 6 / 6 +
+      samplesize / 6 / 6 / 6 +
+      samplesize / 6 / 6 / 6 / 6
 
     expect(count).toBe(expected)
   })
@@ -336,6 +442,116 @@ describe('hits and wounds', () => {
     let expected = (samplesize / 2) * (1 / 2 + 1 / 6 / 2)
     let allSixes = (samplesize / 2) * (1 / 6 + 1 / 6 / 6)
     expected = expected + allSixes * (1 / 2 + 1 / 6 / 2)
+
+    expect(count).toBe(expected)
+  })
+
+  test('keep', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        doWounds: true,
+        keepWoundSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = (samplesize / 2) * (1 / 2)
+
+    expect(count).toBe(expected)
+  })
+
+  test('keep, mod = +2', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        t: 8,
+        woundmod: 2,
+        doWounds: true,
+        keepWoundSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = (samplesize / 2) * (3 / 6)
+
+    expect(count).toBe(expected)
+  })
+
+  test('keep, mod = -2', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        t: 5,
+        woundmod: -2,
+        doWounds: true,
+        keepWoundSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = (samplesize / 2) * (1 / 6)
+
+    expect(count).toBe(expected)
+  })
+
+  test('reroll ones and keep, mod = -2', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        t: 5,
+        woundmod: -2,
+        rerollWoundsOfOne: true,
+        doWounds: true,
+        keepWoundSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize / 2 / 6 + samplesize / 2 / 6 / 6
+
+    expect(count).toBe(expected)
+  })
+
+  test('explode and keep, mod = -2', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        t: 5,
+        woundmod: -2,
+        explodeWounds: true,
+        doWounds: true,
+        keepWoundSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize / 2 / 6 + samplesize / 2 / 6 / 6
+
+    expect(count).toBe(expected)
+  })
+
+  test('rerollOnes and explode and keep, mod = -2', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        ...args,
+        t: 5,
+        woundmod: -2,
+        rerollWoundsOfOne: true,
+        explodeWounds: true,
+        doWounds: true,
+        keepWoundSixes: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected =
+      samplesize / 2 / 6 +
+      samplesize / 2 / 6 / 6 +
+      samplesize / 2 / 6 / 6 +
+      samplesize / 2 / 6 / 6 / 6 +
+      samplesize / 2 / 6 / 6 / 6 +
+      samplesize / 2 / 6 / 6 / 6 / 6
 
     expect(count).toBe(expected)
   })
