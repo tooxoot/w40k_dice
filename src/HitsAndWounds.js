@@ -5,12 +5,12 @@ export class Roller {
 
   rollD6 = () => Math.ceil(this.random() * 6)
 
-  rollHand = count => _hand => [...new Array(count)].map(this.rollD6)
+  rollHand = count => [...new Array(count)].map(this.rollD6)
 
   rerollIf = isTrueFor => hand =>
     hand.map(result => (isTrueFor(result) ? this.rollD6() : result))
 
-  newHand = hand => this.rollHand(hand.length)()
+  newHand = hand => this.rollHand(hand.length)
 
   dropIf = isTrueFor => hand => hand.filter(result => !isTrueFor(result))
 
@@ -25,7 +25,16 @@ export class Roller {
   doSequence = steps =>
     steps.reduce((hands, step) => [...hands, step(hands.slice(-1)[0])], [[]])
 
+  toSubsequence = steps => [
+    hand => [steps[0](hand), hand],
+    ...steps
+      .slice(1)
+      .map(step => ([subResult, hand]) => [step(subResult), hand]),
+    ([subResult, hand]) => [...subResult, ...hand]
+  ]
+
   getSteps = ({
+    initialSteps,
     rerollOnes,
     rerollFails,
     modifyer,
@@ -34,17 +43,23 @@ export class Roller {
   }) => {
     if (rerollFails && explodeSixPlus)
       throw 'Error: Reroll Fails && Explode Sixes'
-    const steps = []
+    let steps = initialSteps ? initialSteps : []
 
     if (rerollOnes) steps.push(this.rerollIf(this.is(1)))
 
     if (explodeSixPlus)
-      steps.push(hand => {
-        let count6 = this.count(this.is(6))(hand)
-        let newRolls = this.rollHand(count6)()
-        if (rerollOnes) newRolls = this.rerollIf(this.is(1))(newRolls)
-        return [...hand, ...newRolls]
-      })
+      steps.push(
+        ...this.toSubsequence(
+          this.getSteps({
+            initialSteps: [this.count(this.is(6)), this.rollHand],
+            rerollOnes,
+            rerollFails,
+            modifyer,
+            explodeSixPlus: false,
+            hasFailed: _ => false
+          })
+        )
+      )
 
     steps.push(this.applyModifier(modifyer))
     if (rerollFails && hasFailed) steps.push(this.rerollIf(hasFailed))
@@ -59,16 +74,15 @@ export class Roller {
     rerollFails,
     modifyer,
     explodeSixPlus
-  }) => [
-    this.rollHand(count),
-    ...this.getSteps({
+  }) =>
+    this.getSteps({
+      initialSteps: [_ => count, this.rollHand],
       rerollOnes,
       rerollFails,
       modifyer,
       explodeSixPlus,
       hasFailed: this.isLessThan(BF)
     })
-  ]
 
   getWoundSteps = ({
     count,
@@ -78,9 +92,9 @@ export class Roller {
     rerollFails,
     modifyer = 0,
     explodeSixPlus
-  }) => [
-    count ? this.rollHand(count) : this.newHand,
-    ...this.getSteps({
+  }) =>
+    this.getSteps({
+      initialSteps: count ? [_ => count, this.rollHand] : [this.newHand],
       rerollOnes,
       rerollFails,
       modifyer,
@@ -96,7 +110,6 @@ export class Roller {
           ? this.isLessThan(5)
           : this.isLessThan(6)
     })
-  ]
 }
 
 const defaultRoller = new Roller()
