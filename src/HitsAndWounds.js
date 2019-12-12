@@ -17,10 +17,13 @@ export class Roller {
   applyModifier = modifyer => hand => hand.map(result => result + modifyer)
 
   is = x => result => result === x
+  isNot = x => result => result !== x
   isLessThan = x => result => result < x
   isGreaterThan = x => result => result > x
 
   count = isTrueFor => hand => hand.filter(isTrueFor).length
+
+  and = (conditionA, conditionB) => arg => conditionA(arg) && conditionB(arg)
 
   doSequence = steps =>
     steps.reduce((hands, step) => [...hands, step(hands.slice(-1)[0])], [[]])
@@ -39,6 +42,7 @@ export class Roller {
     rerollFails,
     modifyer,
     explodeSixPlus,
+    keepSixes,
     hasFailed
   }) => {
     if (rerollFails && explodeSixPlus)
@@ -54,8 +58,9 @@ export class Roller {
             initialSteps: [this.count(this.is(6)), this.rollHand],
             rerollOnes,
             rerollFails,
-            modifyer,
+            modifyer: 0,
             explodeSixPlus: false,
+            keepHitSixes: false,
             hasFailed: _ => false
           })
         )
@@ -63,7 +68,12 @@ export class Roller {
 
     steps.push(this.applyModifier(modifyer))
     if (rerollFails && hasFailed) steps.push(this.rerollIf(hasFailed))
-    steps.push(this.dropIf(hasFailed))
+    steps.push(
+      keepSixes
+        ? this.dropIf(this.and(hasFailed, this.isNot(6 + modifyer)))
+        : this.dropIf(hasFailed)
+    )
+
     return steps
   }
 
@@ -73,6 +83,7 @@ export class Roller {
     rerollOnes,
     rerollFails,
     modifyer,
+    keepSixes,
     explodeSixPlus
   }) =>
     this.getSteps({
@@ -80,6 +91,7 @@ export class Roller {
       rerollOnes,
       rerollFails,
       modifyer,
+      keepSixes,
       explodeSixPlus,
       hasFailed: this.isLessThan(BF)
     })
@@ -91,6 +103,7 @@ export class Roller {
     rerollOnes,
     rerollFails,
     modifyer = 0,
+    keepSixes,
     explodeSixPlus
   }) =>
     this.getSteps({
@@ -98,6 +111,7 @@ export class Roller {
       rerollOnes,
       rerollFails,
       modifyer,
+      keepSixes,
       explodeSixPlus,
       hasFailed:
         S >= 2 * T
@@ -120,6 +134,7 @@ export const getResult = (
     hitmod,
     rerollHitsOfOne,
     rerollHitFails,
+    keepHitSixes,
     explodeHits,
     doWounds,
     s,
@@ -127,6 +142,7 @@ export const getResult = (
     woundmod,
     rerollWoundsOfOne,
     rerollWoundFails,
+    keepWoundSixes,
     explodeWounds
   },
   roller = defaultRoller
@@ -137,6 +153,7 @@ export const getResult = (
     [hitmod, 'number'],
     [rerollHitsOfOne, 'boolean'],
     [rerollHitFails, 'boolean'],
+    [keepWoundSixes, 'boolean'],
     [explodeHits, 'boolean'],
     [doWounds, 'boolean'],
     [s, 'number', v => v > 0],
@@ -144,6 +161,7 @@ export const getResult = (
     [woundmod, 'number'],
     [rerollWoundsOfOne, 'boolean'],
     [rerollWoundFails, 'boolean'],
+    [keepHitSixes, 'boolean'],
     [explodeWounds, 'boolean']
   ]
 
@@ -170,6 +188,7 @@ export const getResult = (
     rerollOnes: rerollHitsOfOne,
     rerollFails: rerollHitFails,
     modifyer: hitmod,
+    keepSixes: keepHitSixes,
     explodeSixPlus: explodeHits
   })
 
@@ -182,6 +201,7 @@ export const getResult = (
         rerollOnes: rerollWoundsOfOne,
         rerollFails: rerollWoundFails,
         modifyer: woundmod,
+        keepSixes: keepWoundSixes,
         explodeSixPlus: explodeWounds
       })
     ]
