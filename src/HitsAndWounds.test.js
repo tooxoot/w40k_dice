@@ -254,15 +254,10 @@ describe('Hits', () => {
   })
 })
 
-describe('wounds', () => {
+describe('Wounds', () => {
   test('simple t = s = 4', () => {
     let roller = new Roller(mockRandom())
-    let count = getResult(
-      {
-        wounds: { ...wounds }
-      },
-      roller
-    ).slice(-1)[0].length
+    let count = getResult({ wounds }, roller).slice(-1)[0].length
     let expected = samplesize * (3 / 6)
 
     expect(count).toBe(expected)
@@ -522,6 +517,22 @@ describe('wounds', () => {
       samplesize / 6 / 6 / 6 +
       samplesize / 6 / 6 / 6 +
       samplesize / 6 / 6 / 6 / 6
+
+    expect(count).toBe(expected)
+  })
+})
+
+describe('Hits ands Wounds', () => {
+  test('simple', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        hits,
+        wounds
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize / 4
 
     expect(count).toBe(expected)
   })
