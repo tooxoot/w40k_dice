@@ -110,7 +110,7 @@ class App extends React.Component {
         rerollOnes: false,
         rerollFails: false,
         keepSixes: false,
-        explodeSixPlus: false
+        explodeSixes: false
       },
       doWounds: false,
       wounds: {
@@ -121,7 +121,7 @@ class App extends React.Component {
         rerollOnes: false,
         rerollFails: false,
         keepSixes: false,
-        explodeSixPlus: false
+        explodeSixes: false
       }
     }
 
@@ -210,8 +210,8 @@ class App extends React.Component {
             />
             <Check
               text="Explode on 6"
-              checked={this.state.hits.explodeSixPlus}
-              onChange={explodeSixPlus => this.setHits({ explodeSixPlus })}
+              checked={this.state.hits.explodeSixes}
+              onChange={explodeSixes => this.setHits({ explodeSixes })}
             />
           </div>
         </>
@@ -280,8 +280,8 @@ class App extends React.Component {
             />
             <Check
               text="Explode on 6"
-              checked={this.state.wounds.explodeSixPlus}
-              onChange={explodeSixPlus => this.setWounds({ explodeSixPlus })}
+              checked={this.state.wounds.explodeSixes}
+              onChange={explodeSixes => this.setWounds({ explodeSixes })}
             />
           </div>
           <Log hands={this.state.hands || [[]]} />

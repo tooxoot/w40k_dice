@@ -41,17 +41,17 @@ export class Roller {
     rerollOnes,
     rerollFails,
     modifyer,
-    explodeSixPlus,
+    explodeSixes,
     keepSixes,
     hasFailed
   }) => {
-    if (rerollFails && explodeSixPlus)
+    if (rerollFails && explodeSixes)
       throw 'Error: Reroll Fails && Explode Sixes'
     let steps = initialSteps ? initialSteps : []
 
     if (rerollOnes) steps.push(this.rerollIf(this.is(1)))
 
-    if (explodeSixPlus)
+    if (explodeSixes)
       steps.push(
         ...this.toSubsequence(
           this.getSteps({
@@ -59,7 +59,7 @@ export class Roller {
             rerollOnes,
             rerollFails,
             modifyer: 0,
-            explodeSixPlus: false,
+            explodeSixes: false,
             keepHitSixes: false,
             hasFailed: _ => false
           })
@@ -84,7 +84,7 @@ export class Roller {
     rerollFails,
     modifyer,
     keepSixes,
-    explodeSixPlus
+    explodeSixes
   }) =>
     this.getSteps({
       initialSteps: [_ => count, this.rollHand],
@@ -92,7 +92,7 @@ export class Roller {
       rerollFails,
       modifyer,
       keepSixes,
-      explodeSixPlus,
+      explodeSixes,
       hasFailed: this.isLessThan(bs)
     })
 
@@ -104,7 +104,7 @@ export class Roller {
     rerollFails,
     modifyer = 0,
     keepSixes,
-    explodeSixPlus
+    explodeSixes
   }) =>
     this.getSteps({
       initialSteps: count ? [_ => count, this.rollHand] : [this.newHand],
@@ -112,7 +112,7 @@ export class Roller {
       rerollFails,
       modifyer,
       keepSixes,
-      explodeSixPlus,
+      explodeSixes,
       hasFailed:
         s >= 2 * t
           ? this.isLessThan(2)
@@ -129,8 +129,8 @@ export class Roller {
 const defaultRoller = new Roller()
 /**
  * @param {{
- *  hits:{count, bs, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixPlus},
- *  wounds:{count, s, t, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixPlus}
+ *  hits:{count, bs, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixes},
+ *  wounds:{count, s, t, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixes}
  * }} opt
  * @param {Roller} roller
  */
@@ -152,7 +152,7 @@ export const getResult = (opt, roller = defaultRoller) => {
       ['hits.rerollOnes', hits.rerollOnes, 'boolean'],
       ['hits.rerollFails', hits.rerollFails, 'boolean'],
       ['hits.keepSixes', hits.keepSixes, 'boolean'],
-      ['hits.explodeSixPlus', hits.explodeSixPlus, 'boolean']
+      ['hits.explodeSixes', hits.explodeSixes, 'boolean']
     )
 
   if (!hits)
@@ -166,7 +166,7 @@ export const getResult = (opt, roller = defaultRoller) => {
       ['wounds.rerollOnes', wounds.rerollOnes, 'boolean'],
       ['wounds.rerollFails', wounds.rerollFails, 'boolean'],
       ['wounds.keepSixes', wounds.keepSixes, 'boolean'],
-      ['wounds.explodeSixPlus', wounds.explodeSixPlus, 'boolean']
+      ['wounds.explodeSixes', wounds.explodeSixes, 'boolean']
     )
 
   checkedTypes.forEach(([name, arg, type, assertion]) => {

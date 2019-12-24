@@ -9,7 +9,7 @@ let hits = {
   rerollOnes: false,
   rerollFails: false,
   keepSixes: false,
-  explodeSixPlus: false
+  explodeSixes: false
 }
 
 let wounds = {
@@ -20,7 +20,7 @@ let wounds = {
   rerollOnes: false,
   rerollFails: false,
   keepSixes: false,
-  explodeSixPlus: false
+  explodeSixes: false
 }
 
 const mockRandom = () => {
@@ -112,7 +112,7 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, explodeSixPlus: true }
+        hits: { ...hits, explodeSixes: true }
       },
       roller
     ).slice(-1)[0].length
@@ -139,7 +139,7 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, rerollOnes: true, explodeSixPlus: true }
+        hits: { ...hits, rerollOnes: true, explodeSixes: true }
       },
       roller
     ).slice(-1)[0].length
@@ -216,7 +216,7 @@ describe('Hits', () => {
           ...hits,
           bs: 5,
           modifyer: -2,
-          explodeSixPlus: true,
+          explodeSixes: true,
           keepSixes: true
         }
       },
@@ -236,7 +236,7 @@ describe('Hits', () => {
           bs: 5,
           modifyer: -2,
           rerollOnes: true,
-          explodeSixPlus: true,
+          explodeSixes: true,
           keepSixes: true
         }
       },
@@ -374,7 +374,7 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, explodeSixPlus: true }
+        wounds: { ...wounds, explodeSixes: true }
       },
       roller
     ).slice(-1)[0].length
@@ -401,7 +401,7 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, rerollOnes: true, explodeSixPlus: true }
+        wounds: { ...wounds, rerollOnes: true, explodeSixes: true }
       },
       roller
     ).slice(-1)[0].length
@@ -484,7 +484,7 @@ describe('Wounds', () => {
           ...wounds,
           t: 5,
           modifyer: -2,
-          explodeSixPlus: true,
+          explodeSixes: true,
           keepSixes: true
         }
       },
@@ -504,7 +504,7 @@ describe('Wounds', () => {
           t: 5,
           modifyer: -2,
           rerollOnes: true,
-          explodeSixPlus: true,
+          explodeSixes: true,
           keepSixes: true
         }
       },
