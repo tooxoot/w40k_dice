@@ -41,17 +41,17 @@ export class Roller {
     rerollOnes,
     rerollFails,
     modifyer,
-    explodeSixPlus,
+    explodeSixes,
     keepSixes,
     hasFailed
   }) => {
-    if (rerollFails && explodeSixPlus)
+    if (rerollFails && explodeSixes)
       throw 'Error: Reroll Fails && Explode Sixes'
     let steps = initialSteps ? initialSteps : []
 
     if (rerollOnes) steps.push(this.rerollIf(this.is(1)))
 
-    if (explodeSixPlus)
+    if (explodeSixes)
       steps.push(
         ...this.toSubsequence(
           this.getSteps({
@@ -59,7 +59,7 @@ export class Roller {
             rerollOnes,
             rerollFails,
             modifyer: 0,
-            explodeSixPlus: false,
+            explodeSixes: false,
             keepHitSixes: false,
             hasFailed: _ => false
           })
@@ -79,12 +79,12 @@ export class Roller {
 
   getHitSteps = ({
     count,
-    BF,
+    bs,
     rerollOnes,
     rerollFails,
     modifyer,
     keepSixes,
-    explodeSixPlus
+    explodeSixes
   }) =>
     this.getSteps({
       initialSteps: [_ => count, this.rollHand],
@@ -92,19 +92,19 @@ export class Roller {
       rerollFails,
       modifyer,
       keepSixes,
-      explodeSixPlus,
-      hasFailed: this.isLessThan(BF)
+      explodeSixes,
+      hasFailed: this.isLessThan(bs)
     })
 
   getWoundSteps = ({
     count,
-    S,
-    T,
+    s,
+    t,
     rerollOnes,
     rerollFails,
     modifyer = 0,
     keepSixes,
-    explodeSixPlus
+    explodeSixes
   }) =>
     this.getSteps({
       initialSteps: count ? [_ => count, this.rollHand] : [this.newHand],
@@ -112,98 +112,92 @@ export class Roller {
       rerollFails,
       modifyer,
       keepSixes,
-      explodeSixPlus,
+      explodeSixes,
       hasFailed:
-        S >= 2 * T
+        s >= 2 * t
           ? this.isLessThan(2)
-          : S > T
+          : s > t
           ? this.isLessThan(3)
-          : S === T
+          : s === t
           ? this.isLessThan(4)
-          : !(2 * S <= T)
+          : !(2 * s <= t)
           ? this.isLessThan(5)
           : this.isLessThan(6)
     })
 }
 
 const defaultRoller = new Roller()
-export const getResult = (
-  {
-    count,
-    bs,
-    hitmod,
-    rerollHitsOfOne,
-    rerollHitFails,
-    keepHitSixes,
-    explodeHits,
-    doWounds,
-    s,
-    t,
-    woundmod,
-    rerollWoundsOfOne,
-    rerollWoundFails,
-    keepWoundSixes,
-    explodeWounds
-  },
-  roller = defaultRoller
-) => {
-  const inputTypes = [
-    [count, 'number', v => v > 0],
-    [bs, 'number', v => v > 0 && v < 7],
-    [hitmod, 'number'],
-    [rerollHitsOfOne, 'boolean'],
-    [rerollHitFails, 'boolean'],
-    [keepWoundSixes, 'boolean'],
-    [explodeHits, 'boolean'],
-    [doWounds, 'boolean'],
-    [s, 'number', v => v > 0],
-    [t, 'number', v => v > 0],
-    [woundmod, 'number'],
-    [rerollWoundsOfOne, 'boolean'],
-    [rerollWoundFails, 'boolean'],
-    [keepHitSixes, 'boolean'],
-    [explodeWounds, 'boolean']
-  ]
+/**
+ * @param {{
+ *  hits:{count, bs, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixes},
+ *  wounds:{count, s, t, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixes}
+ * }} opt
+ * @param {Roller} roller
+ */
+export const getResult = (opt, roller = defaultRoller) => {
+  const { hits, wounds } = opt
 
-  inputTypes.forEach(([arg, type, assertion]) => {
+  if (!hits & !wounds)
+    throw {
+      Error: 'Wrong arguments - Neither hits nor wounds are defined'
+    }
+
+  const checkedTypes = []
+
+  if (hits)
+    checkedTypes.push(
+      ['hits.count', hits.count, 'number', v => v > -1],
+      ['hits.bs', hits.bs, 'number', v => v > 0 && v < 7],
+      ['hits.modifyer', hits.modifyer, 'number'],
+      ['hits.rerollOnes', hits.rerollOnes, 'boolean'],
+      ['hits.rerollFails', hits.rerollFails, 'boolean'],
+      ['hits.keepSixes', hits.keepSixes, 'boolean'],
+      ['hits.explodeSixes', hits.explodeSixes, 'boolean']
+    )
+
+  if (!hits)
+    checkedTypes.push(['wounds.count', wounds.count, 'number', v => v > -1])
+
+  if (wounds)
+    checkedTypes.push(
+      ['wounds.s', wounds.s, 'number', v => v > 0],
+      ['wounds.t', wounds.t, 'number', v => v > 0],
+      ['wounds.modifyer', wounds.modifyer, 'number'],
+      ['wounds.rerollOnes', wounds.rerollOnes, 'boolean'],
+      ['wounds.rerollFails', wounds.rerollFails, 'boolean'],
+      ['wounds.keepSixes', wounds.keepSixes, 'boolean'],
+      ['wounds.explodeSixes', wounds.explodeSixes, 'boolean']
+    )
+
+  checkedTypes.forEach(([name, arg, type, assertion]) => {
     if (typeof arg !== type) {
       throw {
-        Error: `DiecRoller: Wrong argument type`,
-        inputTypes
+        Error: `Wrong argument type of ${name}`,
+        assertion: [arg, type, String(assertion)]
       }
     }
 
     if (type === 'nummber' && !Number.isSafeInteger(arg)) {
-      throw { Error: `DiecRoller: Unsafe integer argument`, inputTypes }
+      throw {
+        Error: `Unsafe integer argument on ${name}`,
+        assertion: [arg, type, String(assertion)]
+      }
     }
 
     if (assertion && !assertion(arg)) {
-      throw { Error: `DiecRoller: Argument failed assertion`, inputTypes }
+      throw {
+        Error: `Argument failed assertion on ${name}`,
+        assertion: [arg, type, String(assertion)]
+      }
     }
   })
 
-  let steps = roller.getHitSteps({
-    count: count,
-    BF: bs,
-    rerollOnes: rerollHitsOfOne,
-    rerollFails: rerollHitFails,
-    modifyer: hitmod,
-    keepSixes: keepHitSixes,
-    explodeSixPlus: explodeHits
-  })
+  let steps = hits ? roller.getHitSteps(hits) : []
 
-  if (doWounds) {
+  if (wounds) {
     steps = [
       ...steps,
-      ...roller.getWoundSteps({
-        S: s,
-        T: t,
-        rerollOnes: rerollWoundsOfOne,
-        rerollFails: rerollWoundFails,
-        modifyer: woundmod,
-        keepSixes: keepWoundSixes,
-        explodeSixPlus: explodeWounds
-      })
+      ...roller.getWoundSteps({ ...wounds, count: !hits && wounds.count })
     ]
   }
 

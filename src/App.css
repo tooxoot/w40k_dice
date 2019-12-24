@@ -38,9 +38,17 @@ button {
   background: #aaffaa;
   outline: none;
 }
-button.roll {
+button.red {
   border-color: lightsalmon;
   background: lightgoldenrodyellow;
+}
+button.postroll {
+  margin-left: auto;
+}
+button.postroll[disabled] {
+  background: #eeeeee;
+  border: 2px solid #bbbbbb;
+  color: #bbbbbb;
 }
 
 h3.wound-title,
@@ -103,4 +111,21 @@ h3 .check {
   border-radius: 10px 0px 10px 10px;
   padding: 10px;
   overflow-wrap: break-word;
+}
+
+.wiggle {
+  animation-duration: 0.1s;
+  animation-name: wiggle;
+  animation-direction: alternate;
+  animation-iteration-count: 6;
+}
+
+@keyframes wiggle {
+  from {
+    margin-right: -3px;
+  }
+
+  to {
+    margin-right: 3px;
+  }
 }

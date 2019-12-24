@@ -102,152 +102,190 @@ class App extends React.Component {
   constructor() {
     super()
     this.state = {
-      hands: [[], []],
-      count: 20,
-      bs: 4,
-      hitmod: 0,
-      rerollHitsOfOne: false,
-      rerollHitFails: false,
-      keepHitSixes: false,
-      explodeHits: false,
+      hands: undefined,
+      hits: {
+        count: 20,
+        bs: 4,
+        modifyer: 0,
+        rerollOnes: false,
+        rerollFails: false,
+        keepSixes: false,
+        explodeSixes: false
+      },
       doWounds: false,
-      s: 4,
-      t: 4,
-      woundmod: 0,
-      rerollWoundsOfOne: false,
-      rerollWoundFails: false,
-      keepWoundSixes: false,
-      explodeWounds: false
+      wounds: {
+        count: 0,
+        s: 4,
+        t: 4,
+        modifyer: 0,
+        rerollOnes: false,
+        rerollFails: false,
+        keepSixes: false,
+        explodeSixes: false
+      }
     }
+
+    this.ref = React.createRef()
   }
 
   roll = () =>
     this.setState({
       hands: getResult({
-        count: this.state.count,
-        bs: this.state.bs,
-        hitmod: this.state.hitmod,
-        rerollHitsOfOne: this.state.rerollHitsOfOne,
-        rerollHitFails: this.state.rerollHitFails,
-        keepHitSixes: this.state.keepHitSixes,
-        explodeHits: this.state.explodeHits,
-        doWounds: this.state.doWounds,
-        s: this.state.s,
-        t: this.state.t,
-        woundmod: this.state.woundmod,
-        rerollWoundsOfOne: this.state.rerollWoundsOfOne,
-        rerollWoundFails: this.state.rerollWoundFails,
-        keepWoundSixes: this.state.keepHitSixes,
-        explodeWounds: this.state.explodeWounds
+        hits: this.state.hits,
+        wounds: this.state.doWounds && this.state.wounds
       })
     })
+
+  postroll() {
+    this.setState({
+      hands: getResult({
+        wounds: this.state.wounds
+      })
+    })
+  }
+
+  wigglePostRoll = () =>
+    !this.state.doWounds &&
+    this.ref.current &&
+    this.ref.current.classList.toggle('wiggle')
+
+  setHits = (hits, callback) =>
+    this.setState({ hits: { ...this.state.hits, ...hits } }, callback)
+  setWounds = (wounds, callback) =>
+    this.setState({ wounds: { ...this.state.wounds, ...wounds } }, callback)
 
   render() {
     return (
       <div className="app">
-        <Table hand={this.state.hands.slice(-2)[0]} />
-        <Total hand={this.state.hands.slice(-1)[0]} />
-        {/* HITS */}
-        <button className="roll" onClick={this.roll}>
+        <Table hand={this.state.hands ? this.state.hands.slice(-2)[0] : []} />
+        <Total hand={this.state.hands ? this.state.hands.slice(-1)[0] : []} />
+        <button
+          className="roll red"
+          onClick={() => {
+            this.roll()
+            this.wigglePostRoll()
+          }}
+        >
           ROLL
         </button>
-        <h3 className="hit-title">Hits:</h3>
-        <Slider
-          text="Count"
-          value={this.state.count}
-          min={1}
-          max={100}
-          onChange={count => this.setState({ count })}
-        />
-        <Slider
-          text="BS"
-          value={this.state.bs}
-          min={1}
-          max={6}
-          onChange={bs => this.setState({ bs })}
-        />
-        <Slider
-          text="Modifier"
-          value={this.state.hitmod}
-          min={-3}
-          max={3}
-          onChange={hitmod => this.setState({ hitmod })}
-        />
-        <div className="check-row">
-          <Check
-            text="Reroll Ones"
-            checked={this.state.rerollHitsOfOne}
-            onChange={rerollHitsOfOne => this.setState({ rerollHitsOfOne })}
+        {/* HITS */}
+        <>
+          <h3 className="hit-title">Hits:</h3>
+          <Slider
+            text="Count"
+            value={this.state.hits.count}
+            min={1}
+            max={100}
+            onChange={count => this.setHits({ count })}
           />
-          <Check
-            text="Reroll Fails"
-            checked={this.state.rerollHitFails}
-            onChange={rerollHitFails => this.setState({ rerollHitFails })}
+          <Slider
+            text="BS"
+            value={this.state.bs}
+            min={1}
+            max={6}
+            onChange={bs => this.setHits({ bs })}
           />
-          <Check
-            text="Keep 6"
-            checked={this.state.keepHitSixes}
-            onChange={keepHitSixes => this.setState({ keepHitSixes })}
+          <Slider
+            text="Modifier"
+            value={this.state.hits.modifyer}
+            min={-3}
+            max={3}
+            onChange={modifyer => this.setHits({ modifyer })}
           />
-          <Check
-            text="Explode on 6"
-            checked={this.state.explodeHits}
-            onChange={explodeHits => this.setState({ explodeHits })}
-          />
-        </div>
+          <div className="check-row">
+            <Check
+              text="Reroll Ones"
+              checked={this.state.hits.rerollOnes}
+              onChange={rerollOnes => this.setHits({ rerollOnes })}
+            />
+            <Check
+              text="Reroll Fails"
+              checked={this.state.hits.rerollFails}
+              onChange={rerollFails => this.setHits({ rerollFails })}
+            />
+            <Check
+              text="Keep 6"
+              checked={this.state.hits.keepSixes}
+              onChange={keepSixes => this.setHits({ keepSixes })}
+            />
+            <Check
+              text="Explode on 6"
+              checked={this.state.hits.explodeSixes}
+              onChange={explodeSixes => this.setHits({ explodeSixes })}
+            />
+          </div>
+        </>
         {/* WOUNDS */}
-        <h3 className="wound-title">
-          Wounds:
-          <Check
-            text=""
-            checked={this.state.doWounds}
-            onChange={doWounds => this.setState({ doWounds })}
+        <>
+          <h3 className="wound-title">
+            Wounds:
+            <Check
+              text=""
+              checked={this.state.doWounds}
+              onChange={doWounds => this.setState({ doWounds })}
+            />
+            <button
+              ref={this.ref}
+              className="postroll red"
+              onAnimationEnd={() => this.ref.current.classList.toggle('wiggle')}
+              onClick={() =>
+                this.setWounds(
+                  {
+                    count: this.state.hands.slice(-1)[0].length
+                  },
+                  this.postroll
+                )
+              }
+              disabled={!(this.state.hands && !this.state.doWounds)}
+            >
+              Roll Wounds using Result
+            </button>
+          </h3>
+          <Slider
+            text="S"
+            value={this.state.wounds.s}
+            min={0}
+            max={10}
+            onChange={s => this.setWounds({ s })}
           />
-        </h3>
-        <Slider
-          text="S"
-          value={this.state.s}
-          min={0}
-          max={10}
-          onChange={s => this.setState({ s })}
-        />
-        <Slider
-          text="T"
-          value={this.state.t}
-          min={0}
-          max={10}
-          onChange={t => this.setState({ t })}
-        />
-        <Slider
-          text="Modifier"
-          value={this.state.woundmod}
-          min={-3}
-          max={3}
-          onChange={woundmod => this.setState({ woundmod })}
-        />
-        <div className="check-row">
-          <Check
-            text="Reroll Ones"
-            checked={this.state.rerollWoundsOfOne}
-            onChange={rerollWoundsOfOne => this.setState({ rerollWoundsOfOne })}
+          <Slider
+            text="T"
+            value={this.state.wounds.t}
+            min={0}
+            max={10}
+            onChange={t => this.setWounds({ t })}
           />
-          <Check
-            text="Reroll Fails"
-            checked={this.state.rerollWoundFails}
-            onChange={rerollWoundFails => this.setState({ rerollWoundFails })}
+          <Slider
+            text="Modifier"
+            value={this.state.wounds.modifyer}
+            min={-3}
+            max={3}
+            onChange={modifyer => this.setWounds({ modifyer })}
           />
-          <Check
-            text="Keep 6"
-            checked={this.state.keepWoundSixes}
-            onChange={keepWoundSixes => this.setState({ keepWoundSixes })}
-          />
-          <Check
-            text="Explode on 6"
-            checked={this.state.explodeWounds}
-            onChange={explodeWounds => this.setState({ explodeWounds })}
-          />
-        </div>
-        <Log hands={this.state.hands} />
+          <div className="check-row">
+            <Check
+              text="Reroll Ones"
+              checked={this.state.wounds.rerollOnes}
+              onChange={rerollOnes => this.setWounds({ rerollOnes })}
+            />
+            <Check
+              text="Reroll Fails"
+              checked={this.state.wounds.rerollFails}
+              onChange={rerollFails => this.setWounds({ rerollFails })}
+            />
+            <Check
+              text="Keep 6"
+              checked={this.state.wounds.keepSixes}
+              onChange={keepSixes => this.setWounds({ keepSixes })}
+            />
+            <Check
+              text="Explode on 6"
+              checked={this.state.wounds.explodeSixes}
+              onChange={explodeSixes => this.setWounds({ explodeSixes })}
+            />
+          </div>
+          <Log hands={this.state.hands || [[]]} />
+        </>
       </div>
     )
   }
