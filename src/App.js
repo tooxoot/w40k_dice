@@ -99,7 +99,7 @@ const Slider = ({ text, value, min, max, onChange }) => (
 )
 
 class App extends React.Component {
-  constructor() {
+  constructor({ aos = false }) {
     super()
     this.state = {
       hands: undefined,
@@ -122,7 +122,8 @@ class App extends React.Component {
         rerollFails: false,
         keepSixes: false,
         explodeSixes: false
-      }
+      },
+      aos
     }
 
     this.ref = React.createRef()
@@ -132,14 +133,16 @@ class App extends React.Component {
     this.setState({
       hands: getResult({
         hits: this.state.hits,
-        wounds: this.state.doWounds && this.state.wounds
+        wounds: this.state.doWounds && this.state.wounds,
+        aos: this.state.doWounds && this.state.aos
       })
     })
 
   postroll() {
     this.setState({
       hands: getResult({
-        wounds: this.state.wounds
+        wounds: this.state.wounds,
+        aos: this.state.aos
       })
     })
   }
@@ -179,7 +182,7 @@ class App extends React.Component {
             onChange={count => this.setHits({ count })}
           />
           <Slider
-            text="BS"
+            text={this.state.aos ? 'To Hit' : 'BS'}
             value={this.state.bs}
             min={1}
             max={6}
@@ -241,20 +244,32 @@ class App extends React.Component {
               Roll Wounds using Result
             </button>
           </h3>
-          <Slider
-            text="S"
-            value={this.state.wounds.s}
-            min={0}
-            max={10}
-            onChange={s => this.setWounds({ s })}
-          />
-          <Slider
-            text="T"
-            value={this.state.wounds.t}
-            min={0}
-            max={10}
-            onChange={t => this.setWounds({ t })}
-          />
+          {this.state.aos ? (
+            <Slider
+              text="To Wound"
+              value={this.state.wounds.s}
+              min={1}
+              max={6}
+              onChange={s => this.setWounds({ s })}
+            />
+          ) : (
+            <>
+              <Slider
+                text="S"
+                value={this.state.wounds.s}
+                min={1}
+                max={10}
+                onChange={s => this.setWounds({ s })}
+              />
+              <Slider
+                text="T"
+                value={this.state.wounds.t}
+                min={1}
+                max={10}
+                onChange={t => this.setWounds({ t })}
+              />
+            </>
+          )}
           <Slider
             text="Modifier"
             value={this.state.wounds.modifyer}

@@ -96,16 +96,19 @@ export class Roller {
       hasFailed: this.isLessThan(bs)
     })
 
-  getWoundSteps = ({
-    count,
-    s,
-    t,
-    rerollOnes,
-    rerollFails,
-    modifyer = 0,
-    keepSixes,
-    explodeSixes
-  }) =>
+  getWoundSteps = (
+    {
+      count,
+      s,
+      t,
+      rerollOnes,
+      rerollFails,
+      modifyer = 0,
+      keepSixes,
+      explodeSixes
+    },
+    aos = false
+  ) =>
     this.getSteps({
       initialSteps: count ? [_ => count, this.rollHand] : [this.newHand],
       rerollOnes,
@@ -113,29 +116,31 @@ export class Roller {
       modifyer,
       keepSixes,
       explodeSixes,
-      hasFailed:
-        s >= 2 * t
-          ? this.isLessThan(2)
-          : s > t
-          ? this.isLessThan(3)
-          : s === t
-          ? this.isLessThan(4)
-          : !(2 * s <= t)
-          ? this.isLessThan(5)
-          : this.isLessThan(6)
+      hasFailed: aos
+        ? this.isLessThan(s)
+        : s >= 2 * t
+        ? this.isLessThan(2)
+        : s > t
+        ? this.isLessThan(3)
+        : s === t
+        ? this.isLessThan(4)
+        : !(2 * s <= t)
+        ? this.isLessThan(5)
+        : this.isLessThan(6)
     })
 }
 
 const defaultRoller = new Roller()
 /**
  * @param {{
- *  hits:{count, bs, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixes},
- *  wounds:{count, s, t, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixes}
+ *  aos: boolean,
+ *  hits?:{count, bs, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixes},
+ *  wounds?:{count, s, t, modifyer, rerollOnes, rerollFails, keepSixes, explodeSixes}
  * }} opt
  * @param {Roller} roller
  */
 export const getResult = (opt, roller = defaultRoller) => {
-  const { hits, wounds } = opt
+  const { aos, hits, wounds } = opt
 
   if (!hits & !wounds)
     throw {
@@ -143,6 +148,8 @@ export const getResult = (opt, roller = defaultRoller) => {
     }
 
   const checkedTypes = []
+
+  checkedTypes.push(['aos', aos, 'boolean'])
 
   if (hits)
     checkedTypes.push(
@@ -161,13 +168,15 @@ export const getResult = (opt, roller = defaultRoller) => {
   if (wounds)
     checkedTypes.push(
       ['wounds.s', wounds.s, 'number', v => v > 0],
-      ['wounds.t', wounds.t, 'number', v => v > 0],
       ['wounds.modifyer', wounds.modifyer, 'number'],
       ['wounds.rerollOnes', wounds.rerollOnes, 'boolean'],
       ['wounds.rerollFails', wounds.rerollFails, 'boolean'],
       ['wounds.keepSixes', wounds.keepSixes, 'boolean'],
       ['wounds.explodeSixes', wounds.explodeSixes, 'boolean']
     )
+
+  if (wounds && !aos)
+    checkedTypes.push(['wounds.t', wounds.t, 'number', v => v > 0])
 
   checkedTypes.forEach(([name, arg, type, assertion]) => {
     if (typeof arg !== type) {
@@ -197,7 +206,7 @@ export const getResult = (opt, roller = defaultRoller) => {
   if (wounds) {
     steps = [
       ...steps,
-      ...roller.getWoundSteps({ ...wounds, count: !hits && wounds.count })
+      ...roller.getWoundSteps({ ...wounds, count: !hits && wounds.count }, aos)
     ]
   }
 

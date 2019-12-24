@@ -37,7 +37,7 @@ test('Roller constructor', () => {
 describe('Hits', () => {
   test('simple bs = 4', () => {
     let roller = new Roller(mockRandom())
-    let count = getResult({ hits }, roller).slice(-1)[0].length
+    let count = getResult({ hits, aos: false }, roller).slice(-1)[0].length
     let expected = samplesize / 2
 
     expect(count).toBe(expected)
@@ -47,7 +47,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, bs: 6 }
+        hits: { ...hits, bs: 6 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -60,7 +61,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, modifyer: 2 }
+        hits: { ...hits, modifyer: 2 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -73,7 +75,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, modifyer: -2 }
+        hits: { ...hits, modifyer: -2 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -86,7 +89,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, rerollOnes: true }
+        hits: { ...hits, rerollOnes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -99,7 +103,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, rerollFails: true }
+        hits: { ...hits, rerollFails: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -112,7 +117,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, explodeSixes: true }
+        hits: { ...hits, explodeSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -125,7 +131,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, rerollOnes: true, rerollFails: true }
+        hits: { ...hits, rerollOnes: true, rerollFails: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -139,7 +146,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, rerollOnes: true, explodeSixes: true }
+        hits: { ...hits, rerollOnes: true, explodeSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -154,7 +162,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, keepSixes: true }
+        hits: { ...hits, keepSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -167,7 +176,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, bs: 6, modifyer: 2, keepSixes: true }
+        hits: { ...hits, bs: 6, modifyer: 2, keepSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -180,7 +190,8 @@ describe('Hits', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        hits: { ...hits, bs: 5, modifyer: -2, keepSixes: true }
+        hits: { ...hits, bs: 5, modifyer: -2, keepSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -199,7 +210,8 @@ describe('Hits', () => {
           modifyer: -2,
           rerollOnes: true,
           keepSixes: true
-        }
+        },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -218,7 +230,8 @@ describe('Hits', () => {
           modifyer: -2,
           explodeSixes: true,
           keepSixes: true
-        }
+        },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -238,7 +251,8 @@ describe('Hits', () => {
           rerollOnes: true,
           explodeSixes: true,
           keepSixes: true
-        }
+        },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -257,7 +271,7 @@ describe('Hits', () => {
 describe('Wounds', () => {
   test('simple t = s = 4', () => {
     let roller = new Roller(mockRandom())
-    let count = getResult({ wounds }, roller).slice(-1)[0].length
+    let count = getResult({ wounds, aos: false }, roller).slice(-1)[0].length
     let expected = samplesize * (3 / 6)
 
     expect(count).toBe(expected)
@@ -267,7 +281,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, t: 3 }
+        wounds: { ...wounds, t: 3 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -280,7 +295,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, t: 1 }
+        wounds: { ...wounds, t: 1 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -293,7 +309,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, t: 7 }
+        wounds: { ...wounds, t: 7 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -306,7 +323,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, t: 16 }
+        wounds: { ...wounds, t: 16 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -319,10 +337,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: {
-          ...wounds,
-          modifyer: 2
-        }
+        wounds: { ...wounds, modifyer: 2 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -335,7 +351,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, modifyer: -2 }
+        wounds: { ...wounds, modifyer: -2 },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -348,7 +365,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, rerollOnes: true }
+        wounds: { ...wounds, rerollOnes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -361,7 +379,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, rerollFails: true }
+        wounds: { ...wounds, rerollFails: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -374,7 +393,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, explodeSixes: true }
+        wounds: { ...wounds, explodeSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -387,7 +407,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, rerollOnes: true, rerollFails: true }
+        wounds: { ...wounds, rerollOnes: true, rerollFails: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -401,7 +422,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, rerollOnes: true, explodeSixes: true }
+        wounds: { ...wounds, rerollOnes: true, explodeSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -416,7 +438,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, keepSixes: true }
+        wounds: { ...wounds, keepSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -429,7 +452,8 @@ describe('Wounds', () => {
     let roller = new Roller(mockRandom())
     let count = getResult(
       {
-        wounds: { ...wounds, t: 8, modifyer: 2, keepSixes: true }
+        wounds: { ...wounds, t: 8, modifyer: 2, keepSixes: true },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -448,7 +472,8 @@ describe('Wounds', () => {
           modifyer: -2,
 
           keepSixes: true
-        }
+        },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -467,7 +492,8 @@ describe('Wounds', () => {
           modifyer: -2,
           rerollOnes: true,
           keepSixes: true
-        }
+        },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -486,7 +512,8 @@ describe('Wounds', () => {
           modifyer: -2,
           explodeSixes: true,
           keepSixes: true
-        }
+        },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -506,7 +533,8 @@ describe('Wounds', () => {
           rerollOnes: true,
           explodeSixes: true,
           keepSixes: true
-        }
+        },
+        aos: false
       },
       roller
     ).slice(-1)[0].length
@@ -528,11 +556,28 @@ describe('Hits ands Wounds', () => {
     let count = getResult(
       {
         hits,
-        wounds
+        wounds,
+        aos: false
       },
       roller
     ).slice(-1)[0].length
     let expected = samplesize / 4
+
+    expect(count).toBe(expected)
+  })
+})
+
+describe('AOS', () => {
+  test('s = 2, t = 4', () => {
+    let roller = new Roller(mockRandom())
+    let count = getResult(
+      {
+        wounds: { ...wounds, s: 2, t: 4 },
+        aos: true
+      },
+      roller
+    ).slice(-1)[0].length
+    let expected = samplesize * (5 / 6)
 
     expect(count).toBe(expected)
   })
