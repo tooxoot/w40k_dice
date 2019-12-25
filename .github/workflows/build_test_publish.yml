@@ -5,7 +5,8 @@ on: [push]
 env:
   GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
   GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
-  GKE_SERVICE: ${{ secrets.GKE_SERVICE}}
+  GKE_SERVICE_40K: ${{ secrets.GKE_SERVICE_40K }}
+  GKE_SERVICE_AOS: ${{ secrets.GKE_SERVICE_AOS }}
   GITHUB_SHA: ${{ github.sha }}
   IMAGE: w40kdice
 
