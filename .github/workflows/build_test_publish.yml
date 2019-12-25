@@ -76,6 +76,10 @@ jobs:
         run: |
           gcloud components install beta
 
-      - name: Deploy image
+      - name: Deploy 40k
         run: |
-          gcloud beta run deploy $GKE_SERVICE --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
+          gcloud beta run deploy $GKE_SERVICE_40K --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
+
+      - name: Deploy aos
+        run: |
+          gcloud beta run deploy $GKE_SERVICE_AOS --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
