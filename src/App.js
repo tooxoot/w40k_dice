@@ -203,7 +203,7 @@ class App extends React.Component {
           />
           <Slider
             text={this.state.aos ? 'To Hit' : 'BS'}
-            value={this.state.bs}
+            value={this.state.hits.bs}
             min={1}
             max={6}
             onChange={bs => this.setHits({ bs })}
