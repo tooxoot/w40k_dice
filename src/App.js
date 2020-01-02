@@ -19,7 +19,7 @@ class Log extends React.Component {
 
   render() {
     return (
-      <div className="log">
+      <div className='log'>
         <div
           className={`log-label ${this.state.expanded ? 'log-expanded' : ''}`}
           onClick={() => this.setState({ expanded: !this.state.expanded })}
@@ -40,15 +40,15 @@ class Log extends React.Component {
 }
 
 const Table = ({ hand }) => (
-  <div className="result-table">
-    <div className="head">&lt; 1</div>
-    <div className="head">1</div>
-    <div className="head">2</div>
-    <div className="head">3</div>
-    <div className="head">4</div>
-    <div className="head">5</div>
-    <div className="head">6</div>
-    <div className="head">&gt; 6</div>
+  <div className='result-table'>
+    <div className='head'>&lt; 1</div>
+    <div className='head'>1</div>
+    <div className='head'>2</div>
+    <div className='head'>3</div>
+    <div className='head'>4</div>
+    <div className='head'>5</div>
+    <div className='head'>6</div>
+    <div className='head'>&gt; 6</div>
     <div>{hand.filter(x => x < 1).length}</div>
     <div>{hand.filter(x => x === 1).length}</div>
     <div>{hand.filter(x => x === 2).length}</div>
@@ -60,12 +60,12 @@ const Table = ({ hand }) => (
   </div>
 )
 
-const Total = ({ hand }) => <div className="total">{hand.length}</div>
+const Total = ({ hand }) => <div className='total'>{hand.length}</div>
 
 const Check = ({ text, checked, onChange }) => (
-  <div className="check">
+  <div className='check'>
     <input
-      type="checkbox"
+      type='checkbox'
       checked={checked}
       onChange={e => onChange(e.target.checked)}
     />
@@ -75,22 +75,22 @@ const Check = ({ text, checked, onChange }) => (
 
 const Slider = ({ text, value, min, max, onChange }) => (
   <>
-    <div className="slider-label">{text}:</div>
-    <div className="slider-value">{value}</div>
+    <div className='slider-label'>{text}:</div>
+    <div className='slider-value'>{value}</div>
     <button
-      className="slider-button slider-decrement"
+      className='slider-button slider-decrement'
       onClick={_ => onChange(value - 1)}
     >
       -
     </button>
     <input
-      className="slider-range"
-      type="range"
+      className='slider-range'
+      type='range'
       onChange={e => onChange(Number(e.target.value))}
       {...{ value, min, max }}
     />
     <button
-      className="slider-button slider-increment"
+      className='slider-button slider-increment'
       onClick={_ => onChange(value + 1)}
     >
       +
@@ -123,10 +123,19 @@ class App extends React.Component {
         keepSixes: false,
         explodeSixes: false
       },
-      aos
+      aos,
+      hasUpdate: false
     }
 
     this.ref = React.createRef()
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.onmessage = () => {
+        if (event.data === 'update-available') {
+          this.setState({ hasUpdate: Boolean(event.data) })
+        }
+      }
+    }
   }
 
   roll = () =>
@@ -159,11 +168,22 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="app">
+      <div className='app'>
+        {this.state.hasUpdate ? (
+          <button className='update' onClick={() => location.reload(false)}>
+            <span>!</span>
+            <svg viewBox='0 0 489.7 489.7' width='20' height='20'>
+              <path d='m469 227.77c-11.4 0-20.8 8.3-20.8 19.8-1 74.9-44.2 142.6-110.3 178.9-99.6 54.7-216 5.6-260.6-61l62.9 13.1c10.4 2.1 21.8-4.2 23.9-15.6 2.1-10.4-4.2-21.8-15.6-23.9l-123.7-26c-7.2-1.7-26.1 3.5-23.9 22.9l15.6 124.8c1 10.4 9.4 17.7 19.8 17.7 15.5 0 21.8-11.4 20.8-22.9l-7.3-60.9c101.1 121.3 229.4 104.4 306.8 69.3 80.1-42.7 131.1-124.8 132.1-215.4 0.1-11.4-8.3-20.8-19.7-20.8z' />
+              <path d='m20.599 261.87c11.4 0 20.8-8.3 20.8-19.8 1-74.9 44.2-142.6 110.3-178.9 99.6-54.7 216-5.6 260.6 61l-62.9-13.1c-10.4-2.1-21.8 4.2-23.9 15.6-2.1 10.4 4.2 21.8 15.6 23.9l123.8 26c7.2 1.7 26.1-3.5 23.9-22.9l-15.6-124.8c-1-10.4-9.4-17.7-19.8-17.7-15.5 0-21.8 11.4-20.8 22.9l7.2 60.9c-101.1-121.2-229.4-104.4-306.8-69.2-80.1 42.6-131.1 124.8-132.2 215.3 0 11.5 8.4 20.8 19.8 20.8z' />
+            </svg>
+          </button>
+        ) : (
+          ''
+        )}
         <Table hand={this.state.hands ? this.state.hands.slice(-2)[0] : []} />
         <Total hand={this.state.hands ? this.state.hands.slice(-1)[0] : []} />
         <button
-          className="roll red"
+          className='roll red'
           onClick={() => {
             this.roll()
             this.wigglePostRoll()
@@ -173,9 +193,9 @@ class App extends React.Component {
         </button>
         {/* HITS */}
         <>
-          <h3 className="hit-title">Hits:</h3>
+          <h3 className='hit-title'>Hits:</h3>
           <Slider
-            text="Count"
+            text='Count'
             value={this.state.hits.count}
             min={1}
             max={100}
@@ -183,36 +203,36 @@ class App extends React.Component {
           />
           <Slider
             text={this.state.aos ? 'To Hit' : 'BS'}
-            value={this.state.bs}
+            value={this.state.hits.bs}
             min={1}
             max={6}
             onChange={bs => this.setHits({ bs })}
           />
           <Slider
-            text="Modifier"
+            text='Modifier'
             value={this.state.hits.modifyer}
             min={-3}
             max={3}
             onChange={modifyer => this.setHits({ modifyer })}
           />
-          <div className="check-row">
+          <div className='check-row'>
             <Check
-              text="Reroll Ones"
+              text='Reroll Ones'
               checked={this.state.hits.rerollOnes}
               onChange={rerollOnes => this.setHits({ rerollOnes })}
             />
             <Check
-              text="Reroll Fails"
+              text='Reroll Fails'
               checked={this.state.hits.rerollFails}
               onChange={rerollFails => this.setHits({ rerollFails })}
             />
             <Check
-              text="Keep 6"
+              text='Keep 6'
               checked={this.state.hits.keepSixes}
               onChange={keepSixes => this.setHits({ keepSixes })}
             />
             <Check
-              text="Explode on 6"
+              text='Explode on 6'
               checked={this.state.hits.explodeSixes}
               onChange={explodeSixes => this.setHits({ explodeSixes })}
             />
@@ -220,16 +240,16 @@ class App extends React.Component {
         </>
         {/* WOUNDS */}
         <>
-          <h3 className="wound-title">
+          <h3 className='wound-title'>
             Wounds:
             <Check
-              text=""
+              text=''
               checked={this.state.doWounds}
               onChange={doWounds => this.setState({ doWounds })}
             />
             <button
               ref={this.ref}
-              className="postroll red"
+              className='postroll red'
               onAnimationEnd={() => this.ref.current.classList.toggle('wiggle')}
               onClick={() =>
                 this.setWounds(
@@ -246,7 +266,7 @@ class App extends React.Component {
           </h3>
           {this.state.aos ? (
             <Slider
-              text="To Wound"
+              text='To Wound'
               value={this.state.wounds.s}
               min={1}
               max={6}
@@ -255,14 +275,14 @@ class App extends React.Component {
           ) : (
             <>
               <Slider
-                text="S"
+                text='S'
                 value={this.state.wounds.s}
                 min={1}
                 max={10}
                 onChange={s => this.setWounds({ s })}
               />
               <Slider
-                text="T"
+                text='T'
                 value={this.state.wounds.t}
                 min={1}
                 max={10}
@@ -271,30 +291,30 @@ class App extends React.Component {
             </>
           )}
           <Slider
-            text="Modifier"
+            text='Modifier'
             value={this.state.wounds.modifyer}
             min={-3}
             max={3}
             onChange={modifyer => this.setWounds({ modifyer })}
           />
-          <div className="check-row">
+          <div className='check-row'>
             <Check
-              text="Reroll Ones"
+              text='Reroll Ones'
               checked={this.state.wounds.rerollOnes}
               onChange={rerollOnes => this.setWounds({ rerollOnes })}
             />
             <Check
-              text="Reroll Fails"
+              text='Reroll Fails'
               checked={this.state.wounds.rerollFails}
               onChange={rerollFails => this.setWounds({ rerollFails })}
             />
             <Check
-              text="Keep 6"
+              text='Keep 6'
               checked={this.state.wounds.keepSixes}
               onChange={keepSixes => this.setWounds({ keepSixes })}
             />
             <Check
-              text="Explode on 6"
+              text='Explode on 6'
               checked={this.state.wounds.explodeSixes}
               onChange={explodeSixes => this.setWounds({ explodeSixes })}
             />

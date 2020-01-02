@@ -2,6 +2,9 @@ const HtmlWebPackPlugin = require('html-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = {
+  devServer: {
+    liveReload: true
+  },
   devtool: 'eval-source-map',
   module: {
     rules: [
@@ -32,7 +35,14 @@ module.exports = {
       filename: './index.html'
     }),
     new CopyPlugin([
-      { from: './src/*.ico', to: './[name].[ext]', toType: 'template' }
+      {
+        from: './src/serviceworker.js',
+        to: './[name].[ext]',
+        toType: 'template'
+      },
+      { from: './src/*.ico', to: './[name].[ext]', toType: 'template' },
+      { from: './src/manifest.json', to: './[name].[ext]', toType: 'template' },
+      { from: './src/icons/*', to: './[name].[ext]', toType: 'template' }
     ])
   ]
 }
