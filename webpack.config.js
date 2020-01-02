@@ -2,6 +2,9 @@ const HtmlWebPackPlugin = require('html-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = {
+  devServer: {
+    liveReload: true
+  },
   devtool: 'eval-source-map',
   module: {
     rules: [
