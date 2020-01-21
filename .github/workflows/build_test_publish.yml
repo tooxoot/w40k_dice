@@ -7,6 +7,7 @@ env:
   GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
   GKE_SERVICE_40K: ${{ secrets.GKE_SERVICE_40K }}
   GKE_SERVICE_AOS: ${{ secrets.GKE_SERVICE_AOS }}
+  GKE_SERVICE_HAMMERDICE: ${{ secrets.GKE_SERVICE_HAMMERDICE }}
   GITHUB_SHA: ${{ github.sha }}
   IMAGE: w40kdice
 
@@ -77,10 +78,6 @@ jobs:
         run: |
           gcloud components install beta
 
-      - name: Deploy 40k
+      - name: Deploy to cloud run
         run: |
-          gcloud beta run deploy $GKE_SERVICE_40K --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
-
-      - name: Deploy aos
-        run: |
-          gcloud beta run deploy $GKE_SERVICE_AOS --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
+          gcloud beta run deploy $GKE_SERVICE_HAMMERDICE --image gcr.io/$GKE_PROJECT/$IMAGE:$GITHUB_SHA --platform managed --region europe-west1 --project $GKE_PROJECT
